@@ -41,6 +41,7 @@
   $sidebarAd = is_array($sidebar_ad ?? null) ? $sidebar_ad : null;
 
   $lead = $safeFeatured[0] ?? ($safePosts[0] ?? null);
+  $headlineDeck = array_slice($safePosts, 1, 4);
   $secondary = array_slice($safeFeatured ?: $safePosts, 1, 4);
   $latest = array_slice($safePosts, 0, 9);
   $editorsPicks = array_slice($safePosts, 9, 5);
@@ -165,22 +166,55 @@
 <main class="page-bg">
   <div class="container grid-12 main-home">
     <section class="col-8 col-md-12 stack-32">
-      <section class="hero-card" style="box-shadow: 0 20px 40px -10px rgba(11, 18, 32, 0.1);">
-        <?php if ($lead && !empty($lead['image_main'])): ?>
-          <img class="hero-media" src="<?= hs_base_url($lead['image_main']) ?>" alt="<?= htmlspecialchars($lead['title']) ?>">
-        <?php endif; ?>
-        <div class="hero-content" style="padding: 40px;">
-          <span class="badge" style="background:var(--bg); color:var(--primary); text-transform:uppercase; letter-spacing:0.05em;"><?= htmlspecialchars($lead['category_name'] ?? 'Top Story') ?></span>
-          <h1 style="font-size:48px; margin-top:16px;"><?= htmlspecialchars($lead['title'] ?? 'Welcome to HDSPTV') ?></h1>
-          <p style="font-size:18px; color:var(--text); margin-bottom:24px;"><?= htmlspecialchars($lead['excerpt'] ?? ($settings['tagline'] ?? 'Trusted global coverage from HDSPTV newsroom.')) ?></p>
-          <?php if ($lead): ?>
-            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); padding-top:20px;">
-              <div class="meta" style="font-size:14px;"><?= $formatDate($lead) ?></div>
-              <a class="btn btn-primary" href="<?= $articleLink($lead) ?>" style="border-radius:8px; padding:0 32px;">Read full story</a>
+      <section class="hero-card newspaper-hero">
+        <div class="newspaper-masthead">
+          <span>Sunday Edition</span>
+          <strong><?= htmlspecialchars($settings['site_title'] ?? 'HDSPTV') ?> Daily</strong>
+          <span data-localized-datetime><?= date('F j, Y') ?></span>
+        </div>
+        <div class="newspaper-lead-grid">
+          <article class="newspaper-lead-main">
+            <?php if ($lead && !empty($lead['image_main'])): ?>
+              <img class="hero-media" src="<?= hs_base_url($lead['image_main']) ?>" alt="<?= htmlspecialchars($lead['title']) ?>">
+            <?php endif; ?>
+            <div class="hero-content newspaper-lead-content">
+              <span class="badge newspaper-kicker"><?= htmlspecialchars($lead['category_name'] ?? 'Top Story') ?></span>
+              <h1 class="newspaper-headline"><?= htmlspecialchars($lead['title'] ?? 'Welcome to HDSPTV') ?></h1>
+              <p class="newspaper-summary"><?= htmlspecialchars($lead['excerpt'] ?? ($settings['tagline'] ?? 'Trusted global coverage from HDSPTV newsroom.')) ?></p>
+              <?php if ($lead): ?>
+                <div class="newspaper-lead-footer">
+                  <div class="meta"><?= $formatDate($lead) ?></div>
+                  <a class="btn btn-primary" href="<?= $articleLink($lead) ?>" style="border-radius:8px; padding:0 24px;">Read full story</a>
+                </div>
+              <?php endif; ?>
             </div>
-          <?php endif; ?>
+          </article>
+          <aside class="newspaper-lead-side">
+            <?php foreach ($headlineDeck as $deckItem): ?>
+              <article class="headline-teaser">
+                <span class="meta"><?= htmlspecialchars($deckItem['category_name'] ?? 'News') ?></span>
+                <h3><a href="<?= $articleLink($deckItem) ?>"><?= htmlspecialchars($deckItem['title']) ?></a></h3>
+                <div class="meta"><?= $relativeTime($deckItem) ?></div>
+              </article>
+            <?php endforeach; ?>
+            <?php if (empty($headlineDeck)): ?>
+              <article class="headline-teaser">
+                <h3>More stories coming soon.</h3>
+              </article>
+            <?php endif; ?>
+          </aside>
         </div>
       </section>
+      <?php if (!empty($secondary)): ?>
+      <section class="newswire-strip panel">
+        <?php foreach (array_slice($secondary, 0, 3) as $item): ?>
+          <article>
+            <span><?= htmlspecialchars($item['category_name'] ?? 'News') ?></span>
+            <a href="<?= $articleLink($item) ?>"><?= htmlspecialchars($item['title']) ?></a>
+          </article>
+        <?php endforeach; ?>
+      </section>
+      <?php endif; ?>
 
       <?php if (!empty($homepageSections['featured'])): ?>
       <section>
